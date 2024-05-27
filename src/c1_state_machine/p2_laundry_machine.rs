@@ -40,7 +40,87 @@ impl StateMachine for ClothesMachine {
     type Transition = ClothesAction;
 
     fn next_state(starting_state: &ClothesState, t: &ClothesAction) -> ClothesState {
-        todo!("Exercise 3")
+        // We match on the starting state and the transition to determine the next state.
+        match (starting_state, t) {
+            // handle all clean clothes
+            // If the clothes are clean, wearing them makes them dirty.
+            (ClothesState::Clean(n), ClothesAction::Wear) => {
+                if *n == 1 as u64 {
+                    ClothesState::Tattered
+                } else {
+                    ClothesState::Dirty(n - 1)
+                }
+            }
+            // If the clothes are clean, washing them makes them wet.
+            (ClothesState::Clean(n), ClothesAction::Wash) => {
+                if *n == 1 as u64 {
+                    ClothesState::Tattered
+                } else {
+                    ClothesState::Wet(n - 1)
+                }
+            }
+            // If the clothes are clean, drying them makes them clean.
+            (ClothesState::Clean(n), ClothesAction::Dry) => {
+                if *n == 1 as u64 {
+                    ClothesState::Tattered
+                } else {
+                    ClothesState::Clean(n - 1)
+                }
+            }
+            // handle all dirty clothes
+            // If the clothes are dirty, wearing them makes them dirty.
+            (ClothesState::Dirty(n), ClothesAction::Wear) => {
+                if *n == 1 as u64 {
+                    ClothesState::Tattered
+                } else {
+                    ClothesState::Dirty(n - 1)
+                }
+            }
+            // If the clothes are dirty, washing them makes them wet.
+            (ClothesState::Dirty(n), ClothesAction::Wash) => {
+                if *n == 1 as u64 {
+                    ClothesState::Tattered
+                } else {
+                    ClothesState::Wet(n - 1)
+                }
+            }
+            // If the clothes are dirty, drying them makes them dirty.
+            (ClothesState::Dirty(n), ClothesAction::Dry) => {
+                if *n == 1 as u64 {
+                    ClothesState::Tattered
+                } else {
+                    ClothesState::Dirty(n - 1)
+                }
+            }
+            // handle all wet clothes
+            // If the clothes are wet, wearing them makes them dirty.
+            (ClothesState::Wet(n), ClothesAction::Wear) => {
+                if *n == 1 as u64 {
+                    ClothesState::Tattered
+                } else {
+                    ClothesState::Dirty(n - 1)
+                }
+            }
+            // If the clothes are wet, washing them makes them wet.
+            (ClothesState::Wet(n), ClothesAction::Wash) => {
+                if *n == 1 as u64 {
+                    ClothesState::Tattered
+                } else {
+                    ClothesState::Wet(n - 1)
+                }
+            }
+            // If the clothes are wet, drying them makes them clean.
+            (ClothesState::Wet(n), ClothesAction::Dry) => {
+                if *n == 1 as u64 {
+                    ClothesState::Tattered
+                } else {
+                    ClothesState::Clean(n - 1)
+                }
+            }
+            // handle all tattered clothes
+            // If the clothes are tattered, they remain tattered no matter what is done to them.
+            (ClothesState::Tattered, _) => ClothesState::Tattered,
+        }
     }
 }
 
