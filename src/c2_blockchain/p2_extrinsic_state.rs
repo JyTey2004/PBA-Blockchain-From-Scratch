@@ -31,12 +31,41 @@ pub struct Header {
 impl Header {
     /// Returns a new valid genesis header.
     fn genesis() -> Self {
-        todo!("Exercise 1")
+        // The genesis block is the first block in the chain.
+        // It has no parent, and typically no extrinsic.
+        // The state is typically zero.
+        let parent = 0;
+        let height = 0;
+        let extrinsic = 0;
+        let state = 0;
+
+        Self {
+            parent,
+            height,
+            extrinsic,
+            state,
+            consensus_digest: (),
+        }
     }
 
     /// Create and return a valid child header.
     fn child(&self, extrinsic: u64) -> Self {
-        todo!("Exercise 2")
+        // The child block is the next block in the chain.
+        // It has a parent, which is the hash of the previous block.
+        // The height is one more than the previous block.
+        // The extrinsic is the extrinsic given.
+        // The state is the sum of the previous state and the extrinsic.
+        let parent = hash(self);
+        let height = self.height + 1;
+        let state = self.state + extrinsic;
+
+        Self {
+            parent,
+            height,
+            extrinsic,
+            state,
+            consensus_digest: (),
+        }
     }
 
     /// Verify that all the given headers form a valid chain from this header to the tip.
@@ -48,7 +77,29 @@ impl Header {
     /// So in order for a block to verify, we must have that relationship between the extrinsic,
     /// the previous state, and the current state.
     fn verify_sub_chain(&self, chain: &[Header]) -> bool {
-        todo!("Exercise 3")
+        if chain.is_empty() && self.height == 0 {
+            return true;
+        }
+
+        let mut current = self.clone();
+
+        for block in chain {
+            if block.parent != hash(&current) {
+                return false;
+            }
+
+            if block.height != current.height + 1 {
+                return false;
+            }
+
+            if block.state != current.state + block.extrinsic {
+                return false;
+            }
+
+            current = block.clone();
+        }
+
+        true
     }
 }
 
@@ -56,7 +107,16 @@ impl Header {
 
 /// Build and return a valid chain with the given number of blocks.
 fn build_valid_chain(n: u64) -> Vec<Header> {
-    todo!("Exercise 4")
+    let mut chain = Vec::new();
+    let mut current = Header::genesis();
+    chain.push(current.clone());
+
+    for i in 0..n {
+        current = current.child(i);
+        chain.push(current.clone());
+    }
+
+    chain
 }
 
 /// Build and return a chain with at least three headers.
@@ -70,7 +130,21 @@ fn build_valid_chain(n: u64) -> Vec<Header> {
 /// For this function, ONLY USE the the `genesis()` and `child()` methods to create blocks.
 /// The exercise is still possible.
 fn build_an_invalid_chain() -> Vec<Header> {
-    todo!("Exercise 5")
+    let mut chain = Vec::new();
+    let mut current = Header::genesis();
+    chain.push(current.clone());
+
+    // We will make the chain invalid by changing the parent hash of the second block.
+    let mut invalid = current.child(1);
+    invalid.parent = 0;
+    chain.push(invalid.clone());
+
+    // We will make the chain invalid by changing the height of the third block.
+    let mut invalid = current.child(2);
+    invalid.height = 10;
+    chain.push(invalid.clone());
+
+    chain
 }
 
 /// Build and return two header chains.
@@ -85,7 +159,26 @@ fn build_an_invalid_chain() -> Vec<Header> {
 ///
 /// Side question: What is the fewest number of headers you could create to achieve this goal.
 fn build_forked_chain() -> (Vec<Header>, Vec<Header>) {
-    todo!("Exercise 6")
+    let mut chain1 = Vec::new();
+    let mut chain2 = Vec::new();
+
+    let mut current = Header::genesis();
+    chain1.push(current.clone());
+
+    for i in 0..4 {
+        current = current.child(i);
+        chain1.push(current.clone());
+    }
+
+    current = Header::genesis();
+    chain2.push(current.clone());
+
+    for i in 0..4 {
+        current = current.child(i + 2);
+        chain2.push(current.clone());
+    }
+
+    (chain1, chain2)
 
     // Exercise 7: After you have completed this task, look at how its test is written below.
     // There is a critical thinking question for you there.
