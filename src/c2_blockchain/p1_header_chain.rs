@@ -64,10 +64,6 @@ impl Header {
     /// This method may assume that the block on which it is called is valid, but it
     /// must verify all of the blocks in the slice;
     fn verify_sub_chain(&self, chain: &[Header]) -> bool {
-        if chain.is_empty() && self.height == 0 {
-            return true;
-        }
-
         let mut current = self.clone();
 
         for block in chain {
